@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>XMLHttpRequest #01</title>
+    <link rel='stylesheet' href='css/estilo.css'>
+</head>
+
+<body class="conteudo exercicio">
+    <h1>Estados</h1>
+
+    <script>
+        function ajax(config) { //função para requisição ajax
+            const xhr = new XMLHttpRequest();
+            xhr.open(config.method, config.url, true); //terceiro parametro representa execução de forma ansincrona
+
+            xhr.onload = e => {
+                if(xhr.status === 200){
+                    config.success(xhr.response);
+                }
+
+                else if (xhr.status >= 400){
+                    config.error({
+                        code:xhr.status,
+                        text: xhr.statusText
+                    })
+                }
+            };
+
+            xhr.send();
+        }
+
+        ajax( {
+            url: "dados/estados.json",
+            method: "GET",
+            success(response) {
+                const states = JSON.parse(response);
+
+                const rows = states.map(state => {
+                    const tdId = document.createElement('td');
+                    tdId.innerHTML = state.id;
+
+                    const tdName = document.createElement('td');
+                    tdName.innerHTML = state.nome;
+
+                    const tdInitials = document.createElement('td');
+                    tdInitials.innerHTML = state.sigla;
+
+                    const tr = document.createElement('tr');
+
+                    tr.appendChild(tdId);
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdInitials);
+
+                    return tr;
+                });
+
+                const table = document.createElement('table');
+                rows.forEach(row => table.appendChild(row));
+                document.body.appendChild(table);
+            },
+            error(e){
+                const msg = document.createTextNode(`${e.code}: ${e.text}`);
+                 document.body.appendChild(msg);
+            }
+
+        });
+    </script>
+</body>
